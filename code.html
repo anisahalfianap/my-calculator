@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Calculator</title>
+    <link rel="icon" type="image/x-icon" href="assets/my calculator.png">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #1943ff;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        
+        .calculator-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 100%;
+            max-width: 800px;
+            padding: 20px;
+        }
+        
+        .calculator {
+            width: 100%;
+            max-width: 300px;
+            margin: 0 auto;
+            background-color: #333;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .display {
+            background-color: #eee;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            text-align: right;
+            font-size: 24px;
+            height: 30px;
+            overflow: hidden;
+            word-break: break-all;
+        }
+        
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-gap: 10px;
+        }
+        
+        button {
+            padding: 15px;
+            font-size: 18px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: #555;
+            color: white;
+            transition: background-color 0.2s;
+        }
+        
+        button:hover {
+            background-color: #777;
+        }
+        
+        button.operator {
+            background-color: #ff00f2;
+        }
+        
+        button.operator:hover {
+            background-color: #c526bd;
+        }
+        
+        button.clear {
+            background-color: #40ff69;
+            color: black;
+        }
+        
+        button.clear:hover {
+            background-color: #7ee22d;
+        }
+
+        button.backspace {
+            background-color: #dcff40;
+            color: black;
+        }
+
+        button.backspace:hover {
+            background-color: #e2df2a;
+        }
+        
+        button.equals {
+            background-color: #00b7ff;
+            grid-column: span 2;
+        }
+
+        button.equals:hover {
+            background-color: #22a9df;
+        }
+        
+        .history {
+            width: 100%;
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .history h2 {
+            margin-top: 0;
+            color: #333;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        
+        .history-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+        }
+        
+        .history-item:hover {
+            background-color: #f9f9f9;
+        }
+        
+        .history-expression {
+            color: #666;
+            font-size: 14px;
+            word-break: break-all;
+        }
+        
+        .history-result {
+            font-weight: bold;
+            text-align: right;
+        }
+        
+        .history-time {
+            color: #999;
+            font-size: 12px;
+            margin-top: 3px;
+        }
+        
+        .clear-history {
+            margin-top: 15px;
+            padding: 8px 15px;
+            background-color: #ff6b6b;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+        }
+        
+        .clear-history:hover {
+            background-color: #f73e3e;
+        }
+
+        /* Media Queries for Responsive Design */
+        @media (min-width: 768px) {
+            .calculator-container {
+                flex-direction: row;
+                align-items: flex-start;
+            }
+            
+            .calculator {
+                margin: 0;
+            }
+            
+            .history {
+                flex: 1;
+                max-height: 500px;
+            }
+            
+            .clear-history {
+                width: auto;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            
+            .calculator-container {
+                padding: 10px;
+            }
+            
+            .calculator {
+                padding: 15px;
+            }
+            
+            .buttons {
+                grid-gap: 8px;
+            }
+            
+            button {
+                padding: 12px;
+                font-size: 16px;
+            }
+            
+            .display {
+                font-size: 20px;
+                padding: 12px;
+            }
+            
+            .history {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="calculator-container">
+            <div class="calculator">
+                <div class="display">{{ currentInput || '0' }}</div>
+                <div class="buttons">
+                    <button class="clear" @click="clear">C</button>
+                    <button class="backspace" @click="backspace">⌫</button>
+                    <button class="operator" @click="appendOperator('/')">/</button>
+                    <button class="operator" @click="appendOperator('*')">×</button>
+
+                    <button @click="appendNumber(7)">7</button>
+                    <button @click="appendNumber(8)">8</button>
+                    <button @click="appendNumber(9)">9</button>
+                    <button class="operator" @click="appendOperator('-')">-</button>
+                    
+                    <button @click="appendNumber(4)">4</button>
+                    <button @click="appendNumber(5)">5</button>
+                    <button @click="appendNumber(6)">6</button>
+                    <button class="operator" @click="appendOperator('+')">+</button>
+                    
+                    <button @click="appendNumber(1)">1</button>
+                    <button @click="appendNumber(2)">2</button>
+                    <button @click="appendNumber(3)">3</button>
+                    
+                    <button @click="appendDecimal()">.</button>
+                    <button @click="appendNumber(0)">0</button>
+                    <button class="equals" @click="calculate">=</button>
+                </div>
+            </div>
+            
+            <div class="history">
+                <h2>History Calculations</h2>
+                <div v-if="history.length === 0" style="color: #999; text-align: center; padding: 20px;">
+                    There's no history yet.
+                </div>
+                <div 
+                    v-for="(item, index) in history" 
+                    :key="index" 
+                    class="history-item"
+                    @click="useHistory(item)"
+                >
+                    <div class="history-expression">{{ item.expression }}</div>
+                    <div class="history-result">{{ item.result }}</div>
+                    <div class="history-time">{{ formatTime(item.timestamp) }}</div>
+                </div>
+                <button 
+                    v-if="history.length > 0" 
+                    class="clear-history" 
+                    @click="clearHistory"
+                >
+                    Delete History
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    const { createApp } = Vue;
+    
+    createApp({
+        data() {
+            return {
+                currentInput: '',
+                previousInput: '',
+                operator: null,
+                resetInput: false,
+                history: []
+            }
+        },
+        mounted() {
+            // Pasang event listener saat komponen dimount
+            window.addEventListener('keydown', this.handleKeyPress);
+        },
+        beforeUnmount() {
+            // Lepas event listener saat komponen diunmount
+            window.removeEventListener('keydown', this.handleKeyPress);
+        },
+        methods: {
+            handleKeyPress(event) {
+                // Tangani input angka
+                if (event.key >= '0' && event.key <= '9') {
+                    this.appendNumber(parseInt(event.key));
+                    return;
+                }
+                
+                // Tangani operator
+                switch (event.key) {
+                    case '+':
+                        this.appendOperator('+');
+                        break;
+                    case '-':
+                        this.appendOperator('-');
+                        break;
+                    case '*':
+                        this.appendOperator('*');
+                        break;
+                    case '/':
+                        this.appendOperator('/');
+                        break;
+                    case '.':
+                        this.appendDecimal();
+                        break;
+                    case 'Enter':
+                        this.calculate();
+                        break;
+                    case 'Backspace':
+                        this.backspace();
+                        break;
+                    case 'Escape':
+                        this.clear();
+                        break;
+                    case '=':
+                        this.calculate();
+                        break;
+                }
+                
+                // Cegah aksi default untuk tombol yang kita tangani
+                if (['0','1','2','3','4','5','6','7','8','9','+','-','*','/','.','Enter','Backspace','Escape','='].includes(event.key)) {
+                    event.preventDefault();
+                }
+            },
+            appendNumber(number) {
+                if (this.resetInput) {
+                    this.currentInput = '';
+                    this.resetInput = false;
+                }
+                if (this.currentInput === '0') {
+                    this.currentInput = number.toString();
+                } else {
+                    this.currentInput += number.toString();
+                }
+            },
+            appendDecimal() {
+                if (this.resetInput) {
+                    this.currentInput = '0.';
+                    this.resetInput = false;
+                    return;
+                }
+                if (this.currentInput.includes('.')) return;
+                if (this.currentInput === '') {
+                    this.currentInput = '0.';
+                } else {
+                    this.currentInput += '.';
+                }
+            },
+            appendOperator(op) {
+                if (this.currentInput === '' && this.previousInput === '') return;
+                
+                if (this.previousInput !== '' && !this.resetInput) {
+                    this.calculate();
+                }
+                
+                this.operator = op;
+                this.previousInput = this.currentInput;
+                this.resetInput = true;
+            },
+            clear() {
+                this.currentInput = '';
+                this.previousInput = '';
+                this.operator = null;
+            },
+            backspace() {
+                this.currentInput = this.currentInput.slice(0, -1);
+                if (this.currentInput === '') {
+                    this.currentInput = '0';
+                }
+            },
+            calculate() {
+                if (this.operator === null || this.resetInput) return;
+                
+                let result;
+                const prev = parseFloat(this.previousInput);
+                const current = parseFloat(this.currentInput);
+                let expression = `${this.previousInput} ${this.operator} ${this.currentInput}`;
+                
+                switch (this.operator) {
+                    case '+':
+                        result = prev + current;
+                        break;
+                    case '-':
+                        result = prev - current;
+                        break;
+                    case '*':
+                        result = prev * current;
+                        break;
+                    case '/':
+                        result = prev / current;
+                        break;
+                    default:
+                        return;
+                }
+                
+                this.history.unshift({
+                    expression: expression,
+                    result: result.toString(),
+                    timestamp: new Date()
+                });
+                
+                if (this.history.length > 50) {
+                    this.history.pop();
+                }
+                
+                this.currentInput = result.toString();
+                this.operator = null;
+                this.resetInput = true;
+            },
+            clearHistory() {
+                this.history = [];
+            },
+            useHistory(item) {
+                this.currentInput = item.result;
+                this.resetInput = true;
+            },
+            formatTime(timestamp) {
+                const date = new Date(timestamp);
+                return date.toLocaleString();
+            }
+        }
+    }).mount('#app');
+</script>
+</body>
+</html>
