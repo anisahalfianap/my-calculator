@@ -4,38 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Calculator</title>
-    <link rel="icon" type="image/x-icon" href="assets/my calculator.png">
-    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.js"></script>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
             background-color: #1943ff;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-        
-        .calculator-container {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            width: 100%;
-            max-width: 800px;
+            min-height: 100vh;
             padding: 20px;
         }
         
         .calculator {
-            width: 100%;
-            max-width: 300px;
-            margin: 0 auto;
             background-color: #333;
             border-radius: 10px;
             padding: 20px;
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            max-width: 350px;
+            margin: 0 auto;
         }
 
         .display {
@@ -45,82 +29,72 @@
             border-radius: 5px;
             text-align: right;
             font-size: 24px;
-            height: 30px;
+            height: 60px;
             overflow: hidden;
             word-break: break-all;
         }
         
-        .buttons {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            grid-gap: 10px;
-        }
-        
-        button {
+        .btn-calc {
             padding: 15px;
             font-size: 18px;
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            background-color: #555;
             color: white;
-            transition: background-color 0.2s;
+            transition: all 0.2s;
+            height: 100%;
         }
         
-        button:hover {
+        .btn-number {
+            background-color: #555;
+        }
+        
+        .btn-number:hover {
             background-color: #777;
         }
         
-        button.operator {
+        .btn-operator {
             background-color: #ff00f2;
         }
         
-        button.operator:hover {
+        .btn-operator:hover {
             background-color: #c526bd;
         }
         
-        button.clear {
+        .btn-clear {
             background-color: #40ff69;
             color: black;
         }
         
-        button.clear:hover {
+        .btn-clear:hover {
             background-color: #7ee22d;
         }
 
-        button.backspace {
+        .btn-backspace {
             background-color: #dcff40;
             color: black;
         }
 
-        button.backspace:hover {
+        .btn-backspace:hover {
             background-color: #e2df2a;
         }
         
-        button.equals {
+        .btn-equals {
             background-color: #00b7ff;
-            grid-column: span 2;
+            color: white;
         }
 
-        button.equals:hover {
+        .btn-equals:hover {
             background-color: #22a9df;
         }
         
         .history {
-            width: 100%;
             background-color: #fff;
             border-radius: 10px;
             padding: 20px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            max-height: 400px;
+            height: 500px;
             overflow-y: auto;
-        }
-        
-        .history h2 {
-            margin-top: 0;
-            color: #333;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 10px;
         }
         
         .history-item {
@@ -150,128 +124,122 @@
             margin-top: 3px;
         }
         
-        .clear-history {
-            margin-top: 15px;
-            padding: 8px 15px;
-            background-color: #ff6b6b;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            width: 100%;
-        }
-        
-        .clear-history:hover {
-            background-color: #f73e3e;
-        }
-
-        /* Media Queries for Responsive Design */
-        @media (min-width: 768px) {
-            .calculator-container {
-                flex-direction: row;
-                align-items: flex-start;
-            }
-            
-            .calculator {
-                margin: 0;
-            }
-            
+        @media (max-width: 767.98px) {
             .history {
-                flex: 1;
-                max-height: 500px;
-            }
-            
-            .clear-history {
-                width: auto;
-            }
-        }
-
-        @media (max-width: 480px) {
-            body {
-                padding: 10px;
-            }
-            
-            .calculator-container {
-                padding: 10px;
+                margin-top: 20px;
+                height: 300px;
             }
             
             .calculator {
-                padding: 15px;
+                max-width: 100%;
             }
             
-            .buttons {
-                grid-gap: 8px;
-            }
-            
-            button {
+            .btn-calc {
                 padding: 12px;
                 font-size: 16px;
-            }
-            
-            .display {
-                font-size: 20px;
-                padding: 12px;
-            }
-            
-            .history {
-                padding: 15px;
             }
         }
     </style>
 </head>
 <body>
     <div id="app">
-        <div class="calculator-container">
-            <div class="calculator">
-                <div class="display">{{ currentInput || '0' }}</div>
-                <div class="buttons">
-                    <button class="clear" @click="clear">C</button>
-                    <button class="backspace" @click="backspace">⌫</button>
-                    <button class="operator" @click="appendOperator('/')">/</button>
-                    <button class="operator" @click="appendOperator('*')">×</button>
-
-                    <button @click="appendNumber(7)">7</button>
-                    <button @click="appendNumber(8)">8</button>
-                    <button @click="appendNumber(9)">9</button>
-                    <button class="operator" @click="appendOperator('-')">-</button>
-                    
-                    <button @click="appendNumber(4)">4</button>
-                    <button @click="appendNumber(5)">5</button>
-                    <button @click="appendNumber(6)">6</button>
-                    <button class="operator" @click="appendOperator('+')">+</button>
-                    
-                    <button @click="appendNumber(1)">1</button>
-                    <button @click="appendNumber(2)">2</button>
-                    <button @click="appendNumber(3)">3</button>
-                    
-                    <button @click="appendDecimal()">.</button>
-                    <button @click="appendNumber(0)">0</button>
-                    <button class="equals" @click="calculate">=</button>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 mb-4 mb-md-0">
+                    <div class="calculator">
+                        <div class="display">{{ currentInput || '0' }}</div>
+                        <div class="row g-2 mb-2">
+                            <div class="col-3">
+                                <button class="btn-calc btn-clear w-100" @click="clear">C</button>
+                            </div>
+                            <div class="col-3">
+                                <button class="btn-calc btn-backspace w-100" @click="backspace">⌫</button>
+                            </div>
+                            <div class="col-3">
+                                <button class="btn-calc btn-operator w-100" @click="appendOperator('/')">/</button>
+                            </div>
+                            <div class="col-3">
+                                <button class="btn-calc btn-operator w-100" @click="appendOperator('*')">×</button>
+                            </div>
+                        </div>
+                        <div class="row g-2 mb-2">
+                            <div class="col-3">
+                                <button class="btn-calc btn-number w-100" @click="appendNumber(7)">7</button>
+                            </div>
+                            <div class="col-3">
+                                <button class="btn-calc btn-number w-100" @click="appendNumber(8)">8</button>
+                            </div>
+                            <div class="col-3">
+                                <button class="btn-calc btn-number w-100" @click="appendNumber(9)">9</button>
+                            </div>
+                            <div class="col-3">
+                                <button class="btn-calc btn-operator w-100" @click="appendOperator('-')">-</button>
+                            </div>
+                        </div>
+                        <div class="row g-2 mb-2">
+                            <div class="col-3">
+                                <button class="btn-calc btn-number w-100" @click="appendNumber(4)">4</button>
+                            </div>
+                            <div class="col-3">
+                                <button class="btn-calc btn-number w-100" @click="appendNumber(5)">5</button>
+                            </div>
+                            <div class="col-3">
+                                <button class="btn-calc btn-number w-100" @click="appendNumber(6)">6</button>
+                            </div>
+                            <div class="col-3">
+                                <button class="btn-calc btn-operator w-100" @click="appendOperator('+')">+</button>
+                            </div>
+                        </div>
+                        <div class="row g-2">
+                            <div class="col-3">
+                                <button class="btn-calc btn-number w-100" @click="appendNumber(1)">1</button>
+                            </div>
+                            <div class="col-3">
+                                <button class="btn-calc btn-number w-100" @click="appendNumber(2)">2</button>
+                            </div>
+                            <div class="col-3">
+                                <button class="btn-calc btn-number w-100" @click="appendNumber(3)">3</button>
+                            </div>
+                            <div class="col-3">
+                                <button class="btn-calc btn-number w-100" @click="appendDecimal()">.</button>
+                            </div>
+                        </div>
+                        <div class="row g-2 mt-2">
+                            <div class="col-6">
+                                <button class="btn-calc btn-number w-100" @click="appendNumber(0)">0</button>
+                            </div>
+                            <div class="col-6">
+                                <button class="btn-calc btn-equals w-100" @click="calculate">=</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            
-            <div class="history">
-                <h2>History Calculations</h2>
-                <div v-if="history.length === 0" style="color: #999; text-align: center; padding: 20px;">
-                    There's no history yet.
+                
+                <div class="col-md-6">
+                    <div class="history">
+                        <h2>History Calculations</h2>
+                        <div v-if="history.length === 0" class="text-muted text-center py-4">
+                            There's no history yet.
+                        </div>
+                        <div 
+                            v-for="(item, index) in history" 
+                            :key="index" 
+                            class="history-item"
+                            @click="useHistory(item)"
+                        >
+                            <div class="history-expression">{{ item.expression }}</div>
+                            <div class="history-result">{{ item.result }}</div>
+                            <div class="history-time">{{ formatTime(item.timestamp) }}</div>
+                        </div>
+                        <button 
+                            v-if="history.length > 0" 
+                            class="btn btn-danger w-100 mt-3" 
+                            @click="clearHistory"
+                        >
+                            Delete History
+                        </button>
+                    </div>
                 </div>
-                <div 
-                    v-for="(item, index) in history" 
-                    :key="index" 
-                    class="history-item"
-                    @click="useHistory(item)"
-                >
-                    <div class="history-expression">{{ item.expression }}</div>
-                    <div class="history-result">{{ item.result }}</div>
-                    <div class="history-time">{{ formatTime(item.timestamp) }}</div>
-                </div>
-                <button 
-                    v-if="history.length > 0" 
-                    class="clear-history" 
-                    @click="clearHistory"
-                >
-                    Delete History
-                </button>
             </div>
         </div>
     </div>
@@ -290,22 +258,24 @@
             }
         },
         mounted() {
-            // Pasang event listener saat komponen dimount
             window.addEventListener('keydown', this.handleKeyPress);
+            
+            // Load history from localStorage if available
+            const savedHistory = localStorage.getItem('calculatorHistory');
+            if (savedHistory) {
+                this.history = JSON.parse(savedHistory);
+            }
         },
         beforeUnmount() {
-            // Lepas event listener saat komponen diunmount
             window.removeEventListener('keydown', this.handleKeyPress);
         },
         methods: {
             handleKeyPress(event) {
-                // Tangani input angka
                 if (event.key >= '0' && event.key <= '9') {
                     this.appendNumber(parseInt(event.key));
                     return;
                 }
                 
-                // Tangani operator
                 switch (event.key) {
                     case '+':
                         this.appendOperator('+');
@@ -336,7 +306,6 @@
                         break;
                 }
                 
-                // Cegah aksi default untuk tombol yang kita tangani
                 if (['0','1','2','3','4','5','6','7','8','9','+','-','*','/','.','Enter','Backspace','Escape','='].includes(event.key)) {
                     event.preventDefault();
                 }
@@ -393,6 +362,9 @@
                 let result;
                 const prev = parseFloat(this.previousInput);
                 const current = parseFloat(this.currentInput);
+                
+                if (isNaN(prev) || isNaN(current)) return;
+                
                 let expression = `${this.previousInput} ${this.operator} ${this.currentInput}`;
                 
                 switch (this.operator) {
@@ -407,10 +379,17 @@
                         break;
                     case '/':
                         result = prev / current;
+                        if (!isFinite(result)) {
+                            alert("Cannot divide by zero!");
+                            return;
+                        }
                         break;
                     default:
                         return;
                 }
+                
+                // Round to 8 decimal places to avoid floating point issues
+                result = Math.round(result * 100000000) / 100000000;
                 
                 this.history.unshift({
                     expression: expression,
@@ -418,9 +397,13 @@
                     timestamp: new Date()
                 });
                 
+                // Keep only the last 50 history items
                 if (this.history.length > 50) {
                     this.history.pop();
                 }
+                
+                // Save to localStorage
+                localStorage.setItem('calculatorHistory', JSON.stringify(this.history));
                 
                 this.currentInput = result.toString();
                 this.operator = null;
@@ -428,6 +411,7 @@
             },
             clearHistory() {
                 this.history = [];
+                localStorage.removeItem('calculatorHistory');
             },
             useHistory(item) {
                 this.currentInput = item.result;
@@ -439,6 +423,8 @@
             }
         }
     }).mount('#app');
-</script>
+    </script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
